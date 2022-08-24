@@ -2,9 +2,15 @@
 name = "mu88-cli"
 version = "0.1.0"
 edition = "2021"
-author = "xiuxiu62"
+authors = ["xiuxiu62"]
 
 [dependencies]
 lazy_static = "1.4.0"
 structopt = "0.3.26"
 telnet = "0.2.1"
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
