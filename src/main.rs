@@ -1,4 +1,3 @@
-use generate::generate_bind_file;
 use std::process;
 use structopt::StructOpt;
 use telnet::Telnet;
@@ -24,7 +23,8 @@ struct Options {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let options = Options::from_args();
     if options.generate {
-        generate_bind_file()?;
+        generate::generate_bind_file()?;
+        generate::generate_json_bind_file()?;
         process::exit(0);
     }
 

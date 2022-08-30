@@ -1,6 +1,6 @@
 use std::{env, io, path::PathBuf};
 
-pub(crate) fn generate_bind_file() -> io::Result<()> {
+pub fn generate_bind_file() -> io::Result<()> {
     let mut commands: String = generate_binds()
         .iter()
         .map(|bind| format!("\t\t{bind}\n"))
@@ -38,12 +38,47 @@ lazy_static! {{
     std::fs::write(out_file, contents)
 }
 
+pub fn generate_json_bind_file() -> io::Result<()> {
+    let mut commands: String = generate_json_binds()
+        .iter()
+        .map(|bind| format!("\t{bind}\n"))
+        .collect::<String>()
+        .trim_end()
+        .to_owned();
+    commands.pop();
+
+    let contents = format!(
+        r#"{{
+{commands}            
+}}"#
+    );
+
+    let mut out_file = source_directory();
+    out_file.push("../binds.json");
+
+    std::fs::write(out_file, contents)
+}
+
 fn generate_binds() -> Vec<String> {
     (1..=8)
         .map(|in_port: u8| {
             (1..=8).map(move |out_port: u8| {
                 format!(
                     r#"({in_port}, {out_port}) => b"{}","#,
+                    crate::create_bind_command(in_port, out_port)
+                )
+            })
+        })
+        .flatten()
+        .collect()
+}
+
+fn generate_json_binds() -> Vec<String> {
+    (1..=8)
+        .map(|in_port: u8| {
+            (1..=8).map(move |out_port: u8| {
+                format!(
+                    r#""{in_port}:{out_port}": "{}","#,
                     crate::create_bind_command(in_port, out_port)
                 )
             })
